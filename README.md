@@ -2,8 +2,7 @@
 
 Automated relayer bot for [Sushiswap Settlement](https://github.com/sushiswap/sushiswap-settlement).
 
-| WARNING: This bot is in *pre-alpha* stage so it could harm your funds. Read the code and use it with caution. |
-| --- |
+> **WARNING**: This bot is in *pre-alpha* stage so it could harm your funds. Read the code and use it with caution.
 
 ## Download
 ```shell script
