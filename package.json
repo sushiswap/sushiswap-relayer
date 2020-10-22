@@ -12,8 +12,7 @@
     "build": "tsc",
     "typechain": "bash scripts/typechain.sh",
     "postinstall": "yarn run typechain",
-    "start": "yarn run build && node dist/index.js",
-    "deploy": "bash scripts/deploy.sh"
+    "start": "yarn run build && node dist/index.js"
   },
   "dependencies": {
     "@sushiswap/sdk": "^3.0.1",
