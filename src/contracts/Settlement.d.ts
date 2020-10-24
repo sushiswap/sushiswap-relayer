@@ -25,6 +25,12 @@ interface SettlementInterface extends ethers.utils.Interface {
     "WETH()": FunctionFragment;
     "addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256,tuple[])": FunctionFragment;
     "addLiquidityETH(address,uint256,uint256,uint256,address,uint256,tuple[])": FunctionFragment;
+    "allCanceledHashes(uint256,uint256)": FunctionFragment;
+    "cancelOrder(tuple)": FunctionFragment;
+    "canceled(bytes32)": FunctionFragment;
+    "canceledHashesOfFromToken(address,uint256,uint256)": FunctionFragment;
+    "canceledHashesOfMaker(address,uint256,uint256)": FunctionFragment;
+    "canceledHashesOfToToken(address,uint256,uint256)": FunctionFragment;
     "factory()": FunctionFragment;
     "feeDenominator()": FunctionFragment;
     "feeNumerator()": FunctionFragment;
@@ -35,8 +41,12 @@ interface SettlementInterface extends ethers.utils.Interface {
     "getAmountOut(uint256,uint256,uint256)": FunctionFragment;
     "getAmountsIn(uint256,address[])": FunctionFragment;
     "getAmountsOut(uint256,address[])": FunctionFragment;
-    "hash(address,address,address,uint256,uint256,address,uint256)": FunctionFragment;
+    "hashOfOrder(address,address,address,uint256,uint256,address,uint256)": FunctionFragment;
     "initialize(address,address,address,uint256,uint256)": FunctionFragment;
+    "numberOfAllCanceledHashes()": FunctionFragment;
+    "numberOfCanceledHashesOfFromToken(address)": FunctionFragment;
+    "numberOfCanceledHashesOfMaker(address)": FunctionFragment;
+    "numberOfCanceledHashesOfToToken(address)": FunctionFragment;
     "owner()": FunctionFragment;
     "quote(uint256,uint256,uint256)": FunctionFragment;
     "removeLiquidity(address,address,uint256,uint256,uint256,address,uint256,tuple[])": FunctionFragment;
@@ -116,6 +126,40 @@ interface SettlementInterface extends ethers.utils.Interface {
       }[]
     ]
   ): string;
+  encodeFunctionData(
+    functionFragment: "allCanceledHashes",
+    values: [BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "cancelOrder",
+    values: [
+      {
+        maker: string;
+        fromToken: string;
+        toToken: string;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        recipient: string;
+        deadline: BigNumberish;
+        v: BigNumberish;
+        r: BytesLike;
+        s: BytesLike;
+      }
+    ]
+  ): string;
+  encodeFunctionData(functionFragment: "canceled", values: [BytesLike]): string;
+  encodeFunctionData(
+    functionFragment: "canceledHashesOfFromToken",
+    values: [string, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "canceledHashesOfMaker",
+    values: [string, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "canceledHashesOfToToken",
+    values: [string, BigNumberish, BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "factory", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "feeDenominator",
@@ -188,7 +232,7 @@ interface SettlementInterface extends ethers.utils.Interface {
     values: [BigNumberish, string[]]
   ): string;
   encodeFunctionData(
-    functionFragment: "hash",
+    functionFragment: "hashOfOrder",
     values: [
       string,
       string,
@@ -202,6 +246,22 @@ interface SettlementInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "initialize",
     values: [string, string, string, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "numberOfAllCanceledHashes",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "numberOfCanceledHashesOfFromToken",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "numberOfCanceledHashesOfMaker",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "numberOfCanceledHashesOfToToken",
+    values: [string]
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
@@ -637,6 +697,27 @@ interface SettlementInterface extends ethers.utils.Interface {
     functionFragment: "addLiquidityETH",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "allCanceledHashes",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "cancelOrder",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "canceled", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "canceledHashesOfFromToken",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "canceledHashesOfMaker",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "canceledHashesOfToToken",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "factory", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "feeDenominator",
@@ -668,8 +749,27 @@ interface SettlementInterface extends ethers.utils.Interface {
     functionFragment: "getAmountsOut",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "hash", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "hashOfOrder",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "numberOfAllCanceledHashes",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "numberOfCanceledHashesOfFromToken",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "numberOfCanceledHashesOfMaker",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "numberOfCanceledHashesOfToToken",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "quote", data: BytesLike): Result;
   decodeFunctionResult(
@@ -743,11 +843,13 @@ interface SettlementInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "updateFee", data: BytesLike): Result;
 
   events: {
+    "OrderCanceled(bytes32)": EventFragment;
     "OrderFeeTransferred(bytes32,address,uint256)": EventFragment;
     "OrderFilled(bytes32,uint256,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "OrderCanceled"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OrderFeeTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OrderFilled"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
@@ -886,6 +988,122 @@ export class Settlement extends Contract {
       }[],
       overrides?: PayableOverrides
     ): Promise<ContractTransaction>;
+
+    allCanceledHashes(
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: string[];
+    }>;
+
+    "allCanceledHashes(uint256,uint256)"(
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: string[];
+    }>;
+
+    cancelOrder(
+      order: {
+        maker: string;
+        fromToken: string;
+        toToken: string;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        recipient: string;
+        deadline: BigNumberish;
+        v: BigNumberish;
+        r: BytesLike;
+        s: BytesLike;
+      },
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "cancelOrder(tuple)"(
+      order: {
+        maker: string;
+        fromToken: string;
+        toToken: string;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        recipient: string;
+        deadline: BigNumberish;
+        v: BigNumberish;
+        r: BytesLike;
+        s: BytesLike;
+      },
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    canceled(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: boolean;
+    }>;
+
+    "canceled(bytes32)"(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: boolean;
+    }>;
+
+    canceledHashesOfFromToken(
+      fromToken: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: string[];
+    }>;
+
+    "canceledHashesOfFromToken(address,uint256,uint256)"(
+      fromToken: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: string[];
+    }>;
+
+    canceledHashesOfMaker(
+      maker: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: string[];
+    }>;
+
+    "canceledHashesOfMaker(address,uint256,uint256)"(
+      maker: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: string[];
+    }>;
+
+    canceledHashesOfToToken(
+      toToken: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: string[];
+    }>;
+
+    "canceledHashesOfToToken(address,uint256,uint256)"(
+      toToken: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: string[];
+    }>;
 
     factory(
       overrides?: CallOverrides
@@ -1093,7 +1311,7 @@ export class Settlement extends Contract {
       0: BigNumber[];
     }>;
 
-    hash(
+    hashOfOrder(
       maker: string,
       fromToken: string,
       toToken: string,
@@ -1106,7 +1324,7 @@ export class Settlement extends Contract {
       0: string;
     }>;
 
-    "hash(address,address,address,uint256,uint256,address,uint256)"(
+    "hashOfOrder(address,address,address,uint256,uint256,address,uint256)"(
       maker: string,
       fromToken: string,
       toToken: string,
@@ -1136,6 +1354,60 @@ export class Settlement extends Contract {
       _feeDenominator: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
+
+    numberOfAllCanceledHashes(
+      overrides?: CallOverrides
+    ): Promise<{
+      0: BigNumber;
+    }>;
+
+    "numberOfAllCanceledHashes()"(
+      overrides?: CallOverrides
+    ): Promise<{
+      0: BigNumber;
+    }>;
+
+    numberOfCanceledHashesOfFromToken(
+      fromToken: string,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: BigNumber;
+    }>;
+
+    "numberOfCanceledHashesOfFromToken(address)"(
+      fromToken: string,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: BigNumber;
+    }>;
+
+    numberOfCanceledHashesOfMaker(
+      maker: string,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: BigNumber;
+    }>;
+
+    "numberOfCanceledHashesOfMaker(address)"(
+      maker: string,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: BigNumber;
+    }>;
+
+    numberOfCanceledHashesOfToToken(
+      toToken: string,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: BigNumber;
+    }>;
+
+    "numberOfCanceledHashesOfToToken(address)"(
+      toToken: string,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: BigNumber;
+    }>;
 
     owner(
       overrides?: CallOverrides
@@ -2092,6 +2364,99 @@ export class Settlement extends Contract {
     overrides?: PayableOverrides
   ): Promise<ContractTransaction>;
 
+  allCanceledHashes(
+    page: BigNumberish,
+    limit: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string[]>;
+
+  "allCanceledHashes(uint256,uint256)"(
+    page: BigNumberish,
+    limit: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string[]>;
+
+  cancelOrder(
+    order: {
+      maker: string;
+      fromToken: string;
+      toToken: string;
+      amountIn: BigNumberish;
+      amountOutMin: BigNumberish;
+      recipient: string;
+      deadline: BigNumberish;
+      v: BigNumberish;
+      r: BytesLike;
+      s: BytesLike;
+    },
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "cancelOrder(tuple)"(
+    order: {
+      maker: string;
+      fromToken: string;
+      toToken: string;
+      amountIn: BigNumberish;
+      amountOutMin: BigNumberish;
+      recipient: string;
+      deadline: BigNumberish;
+      v: BigNumberish;
+      r: BytesLike;
+      s: BytesLike;
+    },
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  canceled(arg0: BytesLike, overrides?: CallOverrides): Promise<boolean>;
+
+  "canceled(bytes32)"(
+    arg0: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  canceledHashesOfFromToken(
+    fromToken: string,
+    page: BigNumberish,
+    limit: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string[]>;
+
+  "canceledHashesOfFromToken(address,uint256,uint256)"(
+    fromToken: string,
+    page: BigNumberish,
+    limit: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string[]>;
+
+  canceledHashesOfMaker(
+    maker: string,
+    page: BigNumberish,
+    limit: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string[]>;
+
+  "canceledHashesOfMaker(address,uint256,uint256)"(
+    maker: string,
+    page: BigNumberish,
+    limit: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string[]>;
+
+  canceledHashesOfToToken(
+    toToken: string,
+    page: BigNumberish,
+    limit: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string[]>;
+
+  "canceledHashesOfToToken(address,uint256,uint256)"(
+    toToken: string,
+    page: BigNumberish,
+    limit: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string[]>;
+
   factory(overrides?: CallOverrides): Promise<string>;
 
   "factory()"(overrides?: CallOverrides): Promise<string>;
@@ -2246,7 +2611,7 @@ export class Settlement extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber[]>;
 
-  hash(
+  hashOfOrder(
     maker: string,
     fromToken: string,
     toToken: string,
@@ -2257,7 +2622,7 @@ export class Settlement extends Contract {
     overrides?: CallOverrides
   ): Promise<string>;
 
-  "hash(address,address,address,uint256,uint256,address,uint256)"(
+  "hashOfOrder(address,address,address,uint256,uint256,address,uint256)"(
     maker: string,
     fromToken: string,
     toToken: string,
@@ -2285,6 +2650,40 @@ export class Settlement extends Contract {
     _feeDenominator: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
+
+  numberOfAllCanceledHashes(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "numberOfAllCanceledHashes()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+  numberOfCanceledHashesOfFromToken(
+    fromToken: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "numberOfCanceledHashesOfFromToken(address)"(
+    fromToken: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  numberOfCanceledHashesOfMaker(
+    maker: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "numberOfCanceledHashesOfMaker(address)"(
+    maker: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  numberOfCanceledHashesOfToToken(
+    toToken: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "numberOfCanceledHashesOfToToken(address)"(
+    toToken: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
@@ -3255,6 +3654,99 @@ export class Settlement extends Contract {
       2: BigNumber;
     }>;
 
+    allCanceledHashes(
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string[]>;
+
+    "allCanceledHashes(uint256,uint256)"(
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string[]>;
+
+    cancelOrder(
+      order: {
+        maker: string;
+        fromToken: string;
+        toToken: string;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        recipient: string;
+        deadline: BigNumberish;
+        v: BigNumberish;
+        r: BytesLike;
+        s: BytesLike;
+      },
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "cancelOrder(tuple)"(
+      order: {
+        maker: string;
+        fromToken: string;
+        toToken: string;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        recipient: string;
+        deadline: BigNumberish;
+        v: BigNumberish;
+        r: BytesLike;
+        s: BytesLike;
+      },
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    canceled(arg0: BytesLike, overrides?: CallOverrides): Promise<boolean>;
+
+    "canceled(bytes32)"(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    canceledHashesOfFromToken(
+      fromToken: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string[]>;
+
+    "canceledHashesOfFromToken(address,uint256,uint256)"(
+      fromToken: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string[]>;
+
+    canceledHashesOfMaker(
+      maker: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string[]>;
+
+    "canceledHashesOfMaker(address,uint256,uint256)"(
+      maker: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string[]>;
+
+    canceledHashesOfToToken(
+      toToken: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string[]>;
+
+    "canceledHashesOfToToken(address,uint256,uint256)"(
+      toToken: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string[]>;
+
     factory(overrides?: CallOverrides): Promise<string>;
 
     "factory()"(overrides?: CallOverrides): Promise<string>;
@@ -3409,7 +3901,7 @@ export class Settlement extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber[]>;
 
-    hash(
+    hashOfOrder(
       maker: string,
       fromToken: string,
       toToken: string,
@@ -3420,7 +3912,7 @@ export class Settlement extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "hash(address,address,address,uint256,uint256,address,uint256)"(
+    "hashOfOrder(address,address,address,uint256,uint256,address,uint256)"(
       maker: string,
       fromToken: string,
       toToken: string,
@@ -3448,6 +3940,42 @@ export class Settlement extends Contract {
       _feeDenominator: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    numberOfAllCanceledHashes(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "numberOfAllCanceledHashes()"(
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    numberOfCanceledHashesOfFromToken(
+      fromToken: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "numberOfCanceledHashesOfFromToken(address)"(
+      fromToken: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    numberOfCanceledHashesOfMaker(
+      maker: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "numberOfCanceledHashesOfMaker(address)"(
+      maker: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    numberOfCanceledHashesOfToToken(
+      toToken: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "numberOfCanceledHashesOfToToken(address)"(
+      toToken: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
@@ -4319,6 +4847,8 @@ export class Settlement extends Contract {
   };
 
   filters: {
+    OrderCanceled(hash: BytesLike | null): EventFilter;
+
     OrderFeeTransferred(
       hash: BytesLike | null,
       recipient: string | null,
@@ -4448,6 +4978,99 @@ export class Settlement extends Contract {
         path: string[];
       }[],
       overrides?: PayableOverrides
+    ): Promise<BigNumber>;
+
+    allCanceledHashes(
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "allCanceledHashes(uint256,uint256)"(
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    cancelOrder(
+      order: {
+        maker: string;
+        fromToken: string;
+        toToken: string;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        recipient: string;
+        deadline: BigNumberish;
+        v: BigNumberish;
+        r: BytesLike;
+        s: BytesLike;
+      },
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "cancelOrder(tuple)"(
+      order: {
+        maker: string;
+        fromToken: string;
+        toToken: string;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        recipient: string;
+        deadline: BigNumberish;
+        v: BigNumberish;
+        r: BytesLike;
+        s: BytesLike;
+      },
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    canceled(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
+
+    "canceled(bytes32)"(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    canceledHashesOfFromToken(
+      fromToken: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "canceledHashesOfFromToken(address,uint256,uint256)"(
+      fromToken: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    canceledHashesOfMaker(
+      maker: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "canceledHashesOfMaker(address,uint256,uint256)"(
+      maker: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    canceledHashesOfToToken(
+      toToken: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "canceledHashesOfToToken(address,uint256,uint256)"(
+      toToken: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     factory(overrides?: CallOverrides): Promise<BigNumber>;
@@ -4604,7 +5227,7 @@ export class Settlement extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    hash(
+    hashOfOrder(
       maker: string,
       fromToken: string,
       toToken: string,
@@ -4615,7 +5238,7 @@ export class Settlement extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "hash(address,address,address,uint256,uint256,address,uint256)"(
+    "hashOfOrder(address,address,address,uint256,uint256,address,uint256)"(
       maker: string,
       fromToken: string,
       toToken: string,
@@ -4642,6 +5265,42 @@ export class Settlement extends Contract {
       _feeNumerator: BigNumberish,
       _feeDenominator: BigNumberish,
       overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    numberOfAllCanceledHashes(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "numberOfAllCanceledHashes()"(
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    numberOfCanceledHashesOfFromToken(
+      fromToken: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "numberOfCanceledHashesOfFromToken(address)"(
+      fromToken: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    numberOfCanceledHashesOfMaker(
+      maker: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "numberOfCanceledHashesOfMaker(address)"(
+      maker: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    numberOfCanceledHashesOfToToken(
+      toToken: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "numberOfCanceledHashesOfToToken(address)"(
+      toToken: string,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
@@ -5586,6 +6245,102 @@ export class Settlement extends Contract {
       overrides?: PayableOverrides
     ): Promise<PopulatedTransaction>;
 
+    allCanceledHashes(
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "allCanceledHashes(uint256,uint256)"(
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    cancelOrder(
+      order: {
+        maker: string;
+        fromToken: string;
+        toToken: string;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        recipient: string;
+        deadline: BigNumberish;
+        v: BigNumberish;
+        r: BytesLike;
+        s: BytesLike;
+      },
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "cancelOrder(tuple)"(
+      order: {
+        maker: string;
+        fromToken: string;
+        toToken: string;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        recipient: string;
+        deadline: BigNumberish;
+        v: BigNumberish;
+        r: BytesLike;
+        s: BytesLike;
+      },
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    canceled(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "canceled(bytes32)"(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    canceledHashesOfFromToken(
+      fromToken: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "canceledHashesOfFromToken(address,uint256,uint256)"(
+      fromToken: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    canceledHashesOfMaker(
+      maker: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "canceledHashesOfMaker(address,uint256,uint256)"(
+      maker: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    canceledHashesOfToToken(
+      toToken: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "canceledHashesOfToToken(address,uint256,uint256)"(
+      toToken: string,
+      page: BigNumberish,
+      limit: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     factory(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "factory()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -5742,7 +6497,7 @@ export class Settlement extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    hash(
+    hashOfOrder(
       maker: string,
       fromToken: string,
       toToken: string,
@@ -5753,7 +6508,7 @@ export class Settlement extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "hash(address,address,address,uint256,uint256,address,uint256)"(
+    "hashOfOrder(address,address,address,uint256,uint256,address,uint256)"(
       maker: string,
       fromToken: string,
       toToken: string,
@@ -5780,6 +6535,44 @@ export class Settlement extends Contract {
       _feeNumerator: BigNumberish,
       _feeDenominator: BigNumberish,
       overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    numberOfAllCanceledHashes(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "numberOfAllCanceledHashes()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    numberOfCanceledHashesOfFromToken(
+      fromToken: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "numberOfCanceledHashesOfFromToken(address)"(
+      fromToken: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    numberOfCanceledHashesOfMaker(
+      maker: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "numberOfCanceledHashesOfMaker(address)"(
+      maker: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    numberOfCanceledHashesOfToToken(
+      toToken: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "numberOfCanceledHashesOfToToken(address)"(
+      toToken: string,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;

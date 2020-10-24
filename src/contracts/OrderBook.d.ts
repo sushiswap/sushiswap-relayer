@@ -22,9 +22,7 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 interface OrderBookInterface extends ethers.utils.Interface {
   functions: {
     "allHashes(uint256,uint256)": FunctionFragment;
-    "cancelOrder(bytes32,uint8,bytes32,bytes32)": FunctionFragment;
-    "cancelOrderCallHash(bytes32)": FunctionFragment;
-    "createOrder(address,address,address,uint256,uint256,address,uint256,uint8,bytes32,bytes32)": FunctionFragment;
+    "createOrder(tuple)": FunctionFragment;
     "createOrderCallHash(address,address,address,uint256,uint256,address,uint256)": FunctionFragment;
     "hashesOfFromToken(address,uint256,uint256)": FunctionFragment;
     "hashesOfMaker(address,uint256,uint256)": FunctionFragment;
@@ -41,26 +39,20 @@ interface OrderBookInterface extends ethers.utils.Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "cancelOrder",
-    values: [BytesLike, BigNumberish, BytesLike, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "cancelOrderCallHash",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
     functionFragment: "createOrder",
     values: [
-      string,
-      string,
-      string,
-      BigNumberish,
-      BigNumberish,
-      string,
-      BigNumberish,
-      BigNumberish,
-      BytesLike,
-      BytesLike
+      {
+        maker: string;
+        fromToken: string;
+        toToken: string;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        recipient: string;
+        deadline: BigNumberish;
+        v: BigNumberish;
+        r: BytesLike;
+        s: BytesLike;
+      }
     ]
   ): string;
   encodeFunctionData(
@@ -110,14 +102,6 @@ interface OrderBookInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(functionFragment: "allHashes", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "cancelOrder",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "cancelOrderCallHash",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "createOrder",
     data: BytesLike
   ): Result;
@@ -159,11 +143,9 @@ interface OrderBookInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
-    "OrderCancelled(bytes32)": EventFragment;
     "OrderCreated(bytes32)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "OrderCancelled"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OrderCreated"): EventFragment;
 }
 
@@ -197,61 +179,35 @@ export class OrderBook extends Contract {
       0: string[];
     }>;
 
-    cancelOrder(
-      hash: BytesLike,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "cancelOrder(bytes32,uint8,bytes32,bytes32)"(
-      hash: BytesLike,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    cancelOrderCallHash(
-      hash: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<{
-      0: string;
-    }>;
-
-    "cancelOrderCallHash(bytes32)"(
-      hash: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<{
-      0: string;
-    }>;
-
     createOrder(
-      maker: string,
-      fromToken: string,
-      toToken: string,
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      recipient: string,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
+      order: {
+        maker: string;
+        fromToken: string;
+        toToken: string;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        recipient: string;
+        deadline: BigNumberish;
+        v: BigNumberish;
+        r: BytesLike;
+        s: BytesLike;
+      },
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "createOrder(address,address,address,uint256,uint256,address,uint256,uint8,bytes32,bytes32)"(
-      maker: string,
-      fromToken: string,
-      toToken: string,
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      recipient: string,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
+    "createOrder(tuple)"(
+      order: {
+        maker: string;
+        fromToken: string;
+        toToken: string;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        recipient: string;
+        deadline: BigNumberish;
+        v: BigNumberish;
+        r: BytesLike;
+        s: BytesLike;
+      },
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -454,57 +410,35 @@ export class OrderBook extends Contract {
     overrides?: CallOverrides
   ): Promise<string[]>;
 
-  cancelOrder(
-    hash: BytesLike,
-    v: BigNumberish,
-    r: BytesLike,
-    s: BytesLike,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "cancelOrder(bytes32,uint8,bytes32,bytes32)"(
-    hash: BytesLike,
-    v: BigNumberish,
-    r: BytesLike,
-    s: BytesLike,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  cancelOrderCallHash(
-    hash: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  "cancelOrderCallHash(bytes32)"(
-    hash: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
   createOrder(
-    maker: string,
-    fromToken: string,
-    toToken: string,
-    amountIn: BigNumberish,
-    amountOutMin: BigNumberish,
-    recipient: string,
-    deadline: BigNumberish,
-    v: BigNumberish,
-    r: BytesLike,
-    s: BytesLike,
+    order: {
+      maker: string;
+      fromToken: string;
+      toToken: string;
+      amountIn: BigNumberish;
+      amountOutMin: BigNumberish;
+      recipient: string;
+      deadline: BigNumberish;
+      v: BigNumberish;
+      r: BytesLike;
+      s: BytesLike;
+    },
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "createOrder(address,address,address,uint256,uint256,address,uint256,uint8,bytes32,bytes32)"(
-    maker: string,
-    fromToken: string,
-    toToken: string,
-    amountIn: BigNumberish,
-    amountOutMin: BigNumberish,
-    recipient: string,
-    deadline: BigNumberish,
-    v: BigNumberish,
-    r: BytesLike,
-    s: BytesLike,
+  "createOrder(tuple)"(
+    order: {
+      maker: string;
+      fromToken: string;
+      toToken: string;
+      amountIn: BigNumberish;
+      amountOutMin: BigNumberish;
+      recipient: string;
+      deadline: BigNumberish;
+      v: BigNumberish;
+      r: BytesLike;
+      s: BytesLike;
+    },
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -671,57 +605,35 @@ export class OrderBook extends Contract {
       overrides?: CallOverrides
     ): Promise<string[]>;
 
-    cancelOrder(
-      hash: BytesLike,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "cancelOrder(bytes32,uint8,bytes32,bytes32)"(
-      hash: BytesLike,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    cancelOrderCallHash(
-      hash: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    "cancelOrderCallHash(bytes32)"(
-      hash: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
     createOrder(
-      maker: string,
-      fromToken: string,
-      toToken: string,
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      recipient: string,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
+      order: {
+        maker: string;
+        fromToken: string;
+        toToken: string;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        recipient: string;
+        deadline: BigNumberish;
+        v: BigNumberish;
+        r: BytesLike;
+        s: BytesLike;
+      },
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "createOrder(address,address,address,uint256,uint256,address,uint256,uint8,bytes32,bytes32)"(
-      maker: string,
-      fromToken: string,
-      toToken: string,
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      recipient: string,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
+    "createOrder(tuple)"(
+      order: {
+        maker: string;
+        fromToken: string;
+        toToken: string;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        recipient: string;
+        deadline: BigNumberish;
+        v: BigNumberish;
+        r: BytesLike;
+        s: BytesLike;
+      },
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -877,8 +789,6 @@ export class OrderBook extends Contract {
   };
 
   filters: {
-    OrderCancelled(hash: BytesLike | null): EventFilter;
-
     OrderCreated(hash: BytesLike | null): EventFilter;
   };
 
@@ -895,57 +805,35 @@ export class OrderBook extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    cancelOrder(
-      hash: BytesLike,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "cancelOrder(bytes32,uint8,bytes32,bytes32)"(
-      hash: BytesLike,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    cancelOrderCallHash(
-      hash: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "cancelOrderCallHash(bytes32)"(
-      hash: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     createOrder(
-      maker: string,
-      fromToken: string,
-      toToken: string,
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      recipient: string,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
+      order: {
+        maker: string;
+        fromToken: string;
+        toToken: string;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        recipient: string;
+        deadline: BigNumberish;
+        v: BigNumberish;
+        r: BytesLike;
+        s: BytesLike;
+      },
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "createOrder(address,address,address,uint256,uint256,address,uint256,uint8,bytes32,bytes32)"(
-      maker: string,
-      fromToken: string,
-      toToken: string,
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      recipient: string,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
+    "createOrder(tuple)"(
+      order: {
+        maker: string;
+        fromToken: string;
+        toToken: string;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        recipient: string;
+        deadline: BigNumberish;
+        v: BigNumberish;
+        r: BytesLike;
+        s: BytesLike;
+      },
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -1068,57 +956,35 @@ export class OrderBook extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    cancelOrder(
-      hash: BytesLike,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "cancelOrder(bytes32,uint8,bytes32,bytes32)"(
-      hash: BytesLike,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    cancelOrderCallHash(
-      hash: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "cancelOrderCallHash(bytes32)"(
-      hash: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     createOrder(
-      maker: string,
-      fromToken: string,
-      toToken: string,
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      recipient: string,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
+      order: {
+        maker: string;
+        fromToken: string;
+        toToken: string;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        recipient: string;
+        deadline: BigNumberish;
+        v: BigNumberish;
+        r: BytesLike;
+        s: BytesLike;
+      },
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "createOrder(address,address,address,uint256,uint256,address,uint256,uint8,bytes32,bytes32)"(
-      maker: string,
-      fromToken: string,
-      toToken: string,
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      recipient: string,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
+    "createOrder(tuple)"(
+      order: {
+        maker: string;
+        fromToken: string;
+        toToken: string;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        recipient: string;
+        deadline: BigNumberish;
+        v: BigNumberish;
+        r: BytesLike;
+        s: BytesLike;
+      },
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 

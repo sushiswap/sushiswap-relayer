@@ -1,6 +1,7 @@
 import { address } from "@sushiswap/settlement/deployments/kovan/OrderBook.json";
+import Settlement from "@sushiswap/settlement/deployments/mainnet/Settlement.json";
 import { ethers } from "ethers";
-import { OrderBookFactory } from "./contracts";
+import { OrderBookFactory, SettlementFactory } from "./contracts";
 import Order from "./types/Order";
 
 const LIMIT = 20;
@@ -63,8 +64,9 @@ class Orders {
         kovanProvider: ethers.providers.BaseProvider
     ) {
         const orderBook = OrderBookFactory.connect(address, kovanProvider);
+        const settlement = SettlementFactory.connect(Settlement.address, kovanProvider);
         orderBook.on("OrderCreated", onCreateOrder);
-        orderBook.on("OrderCancelled", onCancelOrder);
+        settlement.on("OrderCanceled", onCancelOrder);
     }
 }
 

@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@sushiswap/sdk": "^3.0.1",
-    "@sushiswap/settlement": "^0.3.0",
+    "@sushiswap/settlement": "^0.5.0",
     "dotenv": "^8.2.0",
     "ethers": "^5.0.17",
     "node-fetch": "^2.6.1",
