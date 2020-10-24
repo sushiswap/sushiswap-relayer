@@ -3,4 +3,5 @@ yarn-error.log
 
 node_modules
 
+src/contracts
 dist
