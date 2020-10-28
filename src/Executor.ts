@@ -19,6 +19,22 @@ const deductFee = (amount: ethers.BigNumber) => {
     return amount.sub(amount.mul(2).div(1000)); // Fee: 0.2%
 };
 
+const argsForOrder = async (order: Order, signer: ethers.Signer) => {
+    const contract = SettlementFactory.connect(address, signer);
+    const arg = {
+        order,
+        amountToFillIn: order.amountIn,
+        path: order.trade.route.path.map(token => token.address)
+    };
+    try {
+        await contract.estimateGas.fillOrder(arg);
+        return arg;
+    } catch (e) {
+        Log.w("  " + order.hash + " will revert");
+        return null;
+    }
+};
+
 class Executor {
     pendingOrders: { [orderHash: string]: ethers.ContractTransaction } = {};
     provider: ethers.providers.BaseProvider;
@@ -71,16 +87,18 @@ class Executor {
 
     async fillOrders(orders: Order[], signer: ethers.Signer) {
         const contract = SettlementFactory.connect(address, signer);
-        const ordersToFill = orders.filter(order => order.trade).filter(order => !this.pendingOrders[order.hash]);
-        if (ordersToFill.length > 0) {
-            const args = ordersToFill.map(order => ({
-                order,
-                amountToFillIn: order.amountIn,
-                path: order.trade.route.path.map(token => token.address)
-            }));
+        const args = (
+            await Promise.all(
+                orders
+                    .filter(order => order.trade)
+                    .filter(order => !this.pendingOrders[order.hash])
+                    .map(order => argsForOrder(order, signer))
+            )
+        ).filter(arg => arg !== null);
+        if (args.length > 0) {
             Log.d("filling orders...");
-            ordersToFill.forEach(order => {
-                Log.d("  " + order.hash + " (amountIn: " + order.trade?.inputAmount.toFixed() + ")");
+            args.forEach(arg => {
+                Log.d("  " + arg.order.hash + " (amountIn: " + arg.order.trade.inputAmount.toFixed() + ")");
             });
             const gasLimit = await contract.estimateGas.fillOrders(args);
             const gasPrice = await signer.getGasPrice();
@@ -88,13 +106,11 @@ class Executor {
                 gasLimit: gasLimit.mul(120).div(100),
                 gasPrice: gasPrice.mul(120).div(100)
             });
-            ordersToFill.forEach(order => {
-                this.pendingOrders[order.hash] = tx;
+            args.forEach(arg => {
+                this.pendingOrders[arg.order.hash] = tx;
             });
             tx.wait().then(() => {
-                ordersToFill.forEach(order => {
-                    delete this.pendingOrders[order.hash];
-                });
+                args.forEach(arg => delete this.pendingOrders[arg.order.hash]);
             });
             Log.d("  tx hash: ", tx.hash);
         }
