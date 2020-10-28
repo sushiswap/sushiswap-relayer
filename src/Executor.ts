@@ -56,7 +56,7 @@ class Executor {
                 )[0];
                 if (trade) {
                     const tradeAmountOutMin = trade.minimumAmountOut(new Percent("0"));
-                    if (order.amountOutMin.lt(tradeAmountOutMin.raw.toString())) {
+                    if (deductFee(order.amountOutMin).lt(tradeAmountOutMin.raw.toString())) {
                         executables.push({
                             ...order,
                             trade

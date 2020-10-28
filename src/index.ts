@@ -16,7 +16,7 @@ const main = async () => {
     let { tokens, pairs } = await updateTokensAndPairs(mainnet.provider);
 
     Log.d("fetching orders...");
-    const orders = await Orders.fetch(kovan.provider);
+    const orders = await Orders.fetch(mainnet.provider, kovan.provider);
     Log.d("found " + orders.length + " orders");
     orders.forEach(order => {
         Log.d("  " + order.hash);
@@ -33,6 +33,7 @@ const main = async () => {
                 orders.splice(index, 1);
             }
         },
+        mainnet.provider,
         kovan.provider
     );
 
