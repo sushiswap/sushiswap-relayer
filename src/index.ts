@@ -53,7 +53,14 @@ const main = async () => {
                 const matched = await executor.match(tokens, pairs, orders, 10000);
                 Log.d("matched " + matched.length + " orders");
                 matched.forEach(order => {
-                    const aux = order.trade ? " at " + order.trade?.executionPrice.toFixed(8) : "";
+                    const aux = order.trade
+                        ? " at " +
+                          order.trade?.executionPrice.toFixed(8) +
+                          " " +
+                          order.trade.route.path[order.trade.route.path.length - 1].symbol +
+                          "/" +
+                          order.trade.route.path[0].symbol
+                        : "";
                     Log.d("  " + order.hash + aux);
                 });
                 await executor.fillOrders(matched, mainnet.wallet);
