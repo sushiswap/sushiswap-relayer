@@ -10,7 +10,7 @@ class Ethereum {
     static Kovan = new Ethereum(42, process.env.KOVAN_API_KEY, process.env.PRIVATE_KEY);
 
     private constructor(chainId: number, apiKey: string, privateKey: string) {
-        this.provider = new ethers.providers.AlchemyWebSocketProvider(chainId, apiKey);
+        this.provider = new ethers.providers.AlchemyProvider(chainId, apiKey);
         this.wallet = new ethers.Wallet(privateKey, this.provider);
     }
 }
