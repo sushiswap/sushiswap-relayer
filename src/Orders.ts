@@ -1,4 +1,4 @@
-import { address } from "@sushiswap/settlement/deployments/kovan/OrderBook.json";
+import OrderBook from "@sushiswap/settlement/deployments/kovan/OrderBook.json";
 import Settlement from "@sushiswap/settlement/deployments/mainnet/Settlement.json";
 import { ethers } from "ethers";
 import { OrderBookFactory, SettlementFactory } from "./contracts";
@@ -9,19 +9,18 @@ const LIMIT = 20;
 export type OnCreateOrder = (hash: string) => Promise<void> | void;
 export type OnCancelOrder = (hash: string) => Promise<void> | void;
 
+const BLOCKS_PER_DAY = 6500;
+
 class Orders {
     private static async fetchCanceledHashes(provider: ethers.providers.BaseProvider) {
+        const fromBlock = (await provider.getBlockNumber()) - BLOCKS_PER_DAY;
         const settlement = SettlementFactory.connect(Settlement.address, provider);
-        const length = (await settlement.numberOfAllCanceledHashes()).toNumber();
-        const pages: number[] = [];
-        for (let i = 0; i * LIMIT < length; i++) pages.push(i);
-        return (await Promise.all(pages.map(page => settlement.allCanceledHashes(page, LIMIT))))
-            .flat()
-            .filter(hash => hash !== ethers.constants.HashZero);
+        const filter = settlement.filters.OrderCanceled(null);
+        return (await settlement.queryFilter(filter, fromBlock)).map(event => event.args![0]);
     }
 
     private static async fetchHashes(kovanProvider: ethers.providers.BaseProvider) {
-        const orderBook = OrderBookFactory.connect(address, kovanProvider);
+        const orderBook = OrderBookFactory.connect(OrderBook.address, kovanProvider);
         const length = (await orderBook.numberOfAllHashes()).toNumber();
         const pages: number[] = [];
         for (let i = 0; i * LIMIT < length; i++) pages.push(i);
@@ -51,7 +50,7 @@ class Orders {
     }
 
     static async fetchOrder(hash: string, kovanProvider: ethers.providers.BaseProvider) {
-        const orderBook = OrderBookFactory.connect(address, kovanProvider);
+        const orderBook = OrderBookFactory.connect(OrderBook.address, kovanProvider);
         const {
             maker,
             fromToken,
@@ -85,7 +84,7 @@ class Orders {
         provider: ethers.providers.BaseProvider,
         kovanProvider: ethers.providers.BaseProvider
     ) {
-        const orderBook = OrderBookFactory.connect(address, kovanProvider);
+        const orderBook = OrderBookFactory.connect(OrderBook.address, kovanProvider);
         const settlement = SettlementFactory.connect(Settlement.address, provider);
         orderBook.on("OrderCreated", onCreateOrder);
         settlement.on("OrderCanceled", onCancelOrder);

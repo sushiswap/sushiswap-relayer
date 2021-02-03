@@ -468,10 +468,10 @@
     tiny-warning "^1.0.3"
     toformat "^2.0.0"
 
-"@sushiswap/settlement@^0.8.0":
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/@sushiswap/settlement/-/settlement-0.8.0.tgz#b0a02eeb096740521a1d495130f109050ee83e14"
-  integrity sha512-RhwkQLZFwxmxd4eu18EdX56bTvjOKVp07UBeRx6nJiNGWKPILoeTtXo2/DRY4MfEJWaKqLPKBDm4MA2wKcMAzg==
+"@sushiswap/settlement@^0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@sushiswap/settlement/-/settlement-0.11.0.tgz#905f8ba11d3f57d0a76c453f7bbde831a880ef58"
+  integrity sha512-a4zM0nVHk+Sm1VkT6CiLSi6wT7Q3Na8mtWmXVRgaBWdmku+IktGlsAVwbGAYFa/9O/cRrsU3KEyHxljXlxzR6Q==
   dependencies:
     "@sushiswap/core" "^1.2.1"
 
